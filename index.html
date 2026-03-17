@@ -1136,11 +1136,9 @@
     }
 
     function App() {
-      const already = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('intro-done');
-      const [done, setDone] = useState(!!already);
+      const [done, setDone] = useState(false);
 
       function finish() {
-        try { sessionStorage.setItem('intro-done', '1'); } catch (_) {}
         setDone(true);
       }
 
