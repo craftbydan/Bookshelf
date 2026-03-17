@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Library Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0F0F11;
+      --surface: #17171A;
+      --raised:  #1E1E22;
+      --border:  rgba(255,255,255,0.07);
+      --text:    #DDDBD5;
+      --muted:   rgba(221,219,213,0.32);
+      --danger:  rgba(220,80,80,0.7);
+      --green:   rgba(80,200,120,0.8);
+      --amber:   #f59e0b;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      min-height: 100dvh;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+
+    .topbar-title {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    .topbar-count {
+      font-size: 12px;
+      color: var(--muted);
+      flex: 1;
+    }
+
+    .btn {
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border-radius: 4px;
+      padding: 0.45rem 0.9rem;
+      transition: opacity 0.12s;
+      white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+      min-height: 34px;
+    }
+
+    .btn:hover    { opacity: 0.8; }
+    .btn:active   { opacity: 0.6; }
+    .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .btn-ghost   { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+    .btn-primary { background: var(--text); color: var(--bg); }
+    .btn-push    { background: #2563eb; color: #fff; }
+
+    /* ── STATUS BAR ── */
+    .status-bar {
+      padding: 0.5rem 1.5rem;
+      font-size: 12px;
+      min-height: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: var(--muted);
+    }
+    .dot.ok      { background: var(--green); }
+    .dot.error   { background: var(--danger); }
+    .dot.loading { background: var(--amber); animation: blink 1s infinite; }
+
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+    .status-msg { color: var(--muted); }
+    .status-msg.ok    { color: var(--green); }
+    .status-msg.error { color: var(--danger); }
+
+    /* ── TABLE WRAP ── */
+    .table-wrap {
+      overflow-x: auto;
+      padding: 0 1.5rem 5rem;
+    }
+
+    .add-bar {
+      padding: 0.85rem 0 0.5rem;
+    }
+
+    /* ── TABLE ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 520px;
+    }
+
+    thead th {
+      text-align: left;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0.55rem 0.6rem;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    /* ── MAIN ROW ── */
+    .row-main {
+      border-bottom: none;
+    }
+
+    .row-main:hover td { background: rgba(255,255,255,0.02); }
+
+    .row-main td {
+      padding: 0.25rem 0.3rem;
+      vertical-align: middle;
+    }
+
+    /* ── ABOUT ROW ── */
+    .row-about td {
+      padding: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .about-wrap {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.22s ease;
+    }
+
+    .about-wrap.open {
+      grid-template-rows: 1fr;
+    }
+
+    .about-inner {
+      overflow: hidden;
+    }
+
+    .about-textarea {
+      display: block;
+      width: 100%;
+      background: var(--raised);
+      border: none;
+      border-top: 1px solid var(--border);
+      padding: 0.65rem 1rem 0.65rem 2.8rem;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 300;
+      color: var(--text);
+      resize: vertical;
+      min-height: 72px;
+      outline: none;
+      line-height: 1.6;
+    }
+
+    .about-textarea::placeholder { color: rgba(221,219,213,0.2); }
+
+    .about-textarea:focus {
+      background: rgba(255,255,255,0.04);
+    }
+
+    /* ── ROW NUMBER ── */
+    .td-num {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: right;
+      padding-right: 0.6rem !important;
+      width: 2.2rem;
+      user-select: none;
+    }
+
+    /* ── CELL INPUTS ── */
+    .cell-input {
+      width: 100%;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 3px;
+      padding: 0.4rem 0.5rem;
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.1s, background 0.1s;
+    }
+
+    .cell-input:focus {
+      border-color: rgba(221,219,213,0.2);
+      background: rgba(255,255,255,0.04);
+    }
+
+    /* ── GENRE SELECT ── */
+    .genre-cell { position: relative; display: flex; flex-direction: column; gap: 0.2rem; }
+
+    .cell-select {
+      width: 100%;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 3px;
+      padding: 0.4rem 1.6rem 0.4rem 0.5rem;
+      font-family: inherit;
+      font-size: 12px;
+      color: var(--muted);
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(221,219,213,0.25)'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.5rem center;
+      transition: border-color 0.1s, background-color 0.1s;
+    }
+
+    .cell-select:focus {
+      border-color: rgba(221,219,213,0.2);
+      background-color: rgba(255,255,255,0.04);
+      color: var(--text);
+    }
+
+    .cell-select option, .cell-select optgroup {
+      background: #1E1E22;
+      color: var(--text);
+    }
+
+    .cell-input.is-custom {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 0.1rem;
+    }
+
+    .cell-input.is-custom:focus { color: var(--text); }
+
+    /* ── ACTION BUTTONS ── */
+    .td-actions {
+      width: 5rem;
+      white-space: nowrap;
+    }
+
+    .btn-icon {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+      line-height: 1;
+      padding: 0.35rem 0.4rem;
+      border-radius: 3px;
+      transition: color 0.12s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+      min-width: 30px;
+      min-height: 30px;
+    }
+
+    .btn-about-toggle {
+      color: rgba(221,219,213,0.2);
+    }
+    .btn-about-toggle:hover   { color: rgba(221,219,213,0.6); }
+    .btn-about-toggle.has-text { color: rgba(221,219,213,0.5); }
+    .btn-about-toggle.is-open  { color: var(--text); }
+
+    .btn-del {
+      color: rgba(220,80,80,0.3);
+    }
+    .btn-del:hover { color: var(--danger); }
+
+    /* ── MOBILE ── */
+    @media (max-width: 640px) {
+      .topbar { padding: 0.75rem 1rem; }
+      .table-wrap { padding: 0 0.75rem 5rem; }
+      .topbar-title { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <span class="topbar-title">Library Admin</span>
+    <span class="topbar-count" id="count">—</span>
+    <button class="btn btn-ghost"    onclick="addRow()">+ Add</button>
+    <button class="btn btn-primary"  id="btn-save" onclick="saveBooks()">Save</button>
+    <button class="btn btn-push"     id="btn-push" onclick="pushToGitHub()">Push</button>
+  </header>
+
+  <div class="status-bar">
+    <span class="dot" id="dot"></span>
+    <span class="status-msg" id="msg">Loading…</span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:2.2rem">#</th>
+          <th style="width:36%">Title</th>
+          <th style="width:26%">Author</th>
+          <th style="width:22%">Genre</th>
+          <th style="width:5rem"></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    let books = [];
+
+    /* ── GENRE OPTIONS ── */
+    const GENRE_PRIMARY = [
+      'Mystery', 'Thriller', 'Horror',
+      'Self-Help', 'Finance', 'Business',
+      'Fiction', 'Non-Fiction', 'Philosophy',
+    ];
+
+    const GENRE_DETAILED = [
+      'Mystery / Crime Fiction', 'Mystery / Detective Fiction',
+      'Mystery / Thriller', 'Mystery / Horror', 'Mystery / Adventure',
+      'Mystery / Fiction', 'Thriller / Mystery', 'Puzzle / Mystery',
+      'Psychological Thriller / Crime', 'Horror / Mystery', 'Horror / Thriller',
+      'Detective Fiction',
+      'Self-Help / Productivity', 'Self-Help / Psychology',
+      'Self-Help / Philosophy', 'Self-Help / Communication',
+      'Self-Help / Personal Development', 'Self-Help / Personal Finance',
+      'Self-Help / Business', 'Self-Help / Humor',
+      'Personal Finance', 'Personal Finance / Non-Fiction', 'Investment / Finance',
+      'Business / Education',
+      'Literary Fiction', 'Historical Fiction', 'Gothic Fiction',
+      'Dark Comedy / Literary Fiction', 'Fiction / Light Novel', 'Fiction / Mystery',
+      'Non-Fiction / Technology', 'Non-Fiction / Science', 'Non-Fiction / History',
+      'Non-Fiction / Humor', 'Non-Fiction / Mathematics',
+      'Philosophy / Ethics',
+    ];
+
+    function buildGenreOptions(current) {
+      const inUse = [...new Set(books.map(b => (b.genre || '').trim()))]
+        .filter(g => g && !GENRE_PRIMARY.includes(g) && !GENRE_DETAILED.includes(g))
+        .sort();
+
+      const isKnown = GENRE_PRIMARY.includes(current) || GENRE_DETAILED.includes(current) || inUse.includes(current);
+
+      let html = `<option value="" disabled ${!current ? 'selected' : ''}>— Pick a genre —</option>`;
+
+      html += `<optgroup label="Primary">`;
+      GENRE_PRIMARY.forEach(g => {
+        html += `<option value="${g}" ${current === g ? 'selected' : ''}>${g}</option>`;
+      });
+      html += `</optgroup>`;
+
+      html += `<optgroup label="Detailed">`;
+      GENRE_DETAILED.forEach(g => {
+        html += `<option value="${g}" ${current === g ? 'selected' : ''}>${g}</option>`;
+      });
+      html += `</optgroup>`;
+
+      if (inUse.length) {
+        html += `<optgroup label="In use">`;
+        inUse.forEach(g => {
+          html += `<option value="${g}" ${current === g ? 'selected' : ''}>${g}</option>`;
+        });
+        html += `</optgroup>`;
+      }
+
+      html += `<option value="__custom__" ${!isKnown && current ? 'selected' : ''}>Custom…</option>`;
+      return html;
+    }
+
+    /* ── STATUS ── */
+    function status(type, text) {
+      document.getElementById('dot').className = `dot ${type}`;
+      const m = document.getElementById('msg');
+      m.className = `status-msg ${type}`;
+      m.textContent = text;
+    }
+
+    function updateCount() {
+      document.getElementById('count').textContent = `${books.length} books`;
+    }
+
+    /* ── ESCAPE ── */
+    function esc(s) {
+      return String(s ?? '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+    }
+
+    /* ── RENDER ── */
+    function render() {
+      const tbody = document.getElementById('tbody');
+      tbody.innerHTML = '';
+
+      books.forEach((b, i) => {
+        const hasAbout = !!(b.about || '').trim();
+
+        /* ─ Main row ─ */
+        const tr = document.createElement('tr');
+        tr.className = 'row-main';
+        tr.dataset.i = i;
+        const genre   = b.genre || '';
+        const isKnown = GENRE_PRIMARY.includes(genre) || GENRE_DETAILED.includes(genre);
+
+        tr.innerHTML = `
+          <td class="td-num">${i + 1}</td>
+          <td><input class="cell-input" data-f="book_name" value="${esc(b.book_name)}" placeholder="Title" /></td>
+          <td><input class="cell-input" data-f="author"    value="${esc(b.author)}"    placeholder="Author" /></td>
+          <td>
+            <div class="genre-cell">
+              <select class="cell-select" data-genre-select="${i}">
+                ${buildGenreOptions(genre)}
+              </select>
+              <input
+                class="cell-input is-custom"
+                data-genre-custom="${i}"
+                placeholder="Type custom genre…"
+                value="${esc(!isKnown && genre ? genre : '')}"
+                style="display:${!isKnown && genre ? 'block' : 'none'}"
+              />
+            </div>
+          </td>
+          <td class="td-actions">
+            <button
+              class="btn-icon btn-about-toggle ${hasAbout ? 'has-text is-open' : ''}"
+              title="${hasAbout ? 'Edit description' : 'Add description'}"
+              data-about-btn="${i}"
+            >✎</button>
+            <button class="btn-icon btn-del" data-del="${i}" title="Delete">×</button>
+          </td>
+        `;
+
+        /* Genre select → update books array */
+        const sel = tr.querySelector(`[data-genre-select="${i}"]`);
+        const customInput = tr.querySelector(`[data-genre-custom="${i}"]`);
+
+        sel.addEventListener('change', () => {
+          if (sel.value === '__custom__') {
+            customInput.style.display = 'block';
+            customInput.value = '';
+            customInput.focus();
+            books[i].genre = '';
+          } else {
+            customInput.style.display = 'none';
+            books[i].genre = sel.value;
+          }
+          status('', 'Unsaved changes…');
+        });
+
+        customInput.addEventListener('input', () => {
+          books[i].genre = customInput.value;
+          status('', 'Unsaved changes…');
+        });
+
+        /* Sync other inputs → books array */
+        tr.querySelectorAll('.cell-input[data-f]').forEach(inp => {
+          inp.addEventListener('input', () => {
+            books[i][inp.dataset.f] = inp.value;
+            status('', 'Unsaved changes…');
+          });
+        });
+
+        tbody.appendChild(tr);
+
+        /* ─ About row ─ */
+        const ar = document.createElement('tr');
+        ar.className = 'row-about';
+        ar.dataset.aboutRow = i;
+        ar.innerHTML = `
+          <td colspan="5">
+            <div class="about-wrap ${hasAbout ? 'open' : ''}" data-about-wrap="${i}">
+              <div class="about-inner">
+                <textarea
+                  class="about-textarea"
+                  data-f="about"
+                  data-about-ta="${i}"
+                  placeholder="What is this book about? (optional — shown when tapped on the site)"
+                  rows="3"
+                >${esc(b.about || '')}</textarea>
+              </div>
+            </div>
+          </td>
+        `;
+
+        ar.querySelector('textarea').addEventListener('input', e => {
+          books[i].about = e.target.value;
+          /* Update the toggle button style */
+          const btn = document.querySelector(`[data-about-btn="${i}"]`);
+          if (btn) btn.classList.toggle('has-text', !!e.target.value.trim());
+          status('', 'Unsaved changes…');
+        });
+
+        tbody.appendChild(ar);
+      });
+
+      /* ─ Event delegation: toggle about rows + delete ─ */
+      tbody.onclick = (e) => {
+        /* Toggle about */
+        const btn = e.target.closest('[data-about-btn]');
+        if (btn) {
+          const i    = btn.dataset.aboutBtn;
+          const wrap = document.querySelector(`[data-about-wrap="${i}"]`);
+          const isOpen = wrap.classList.toggle('open');
+          btn.classList.toggle('is-open', isOpen);
+          if (isOpen) {
+            const ta = document.querySelector(`[data-about-ta="${i}"]`);
+            ta?.focus();
+          }
+          return;
+        }
+        /* Delete */
+        const del = e.target.closest('[data-del]');
+        if (del) {
+          const i = parseInt(del.dataset.del);
+          const title = books[i].book_name || 'this entry';
+          if (!confirm(`Remove "${title}"?`)) return;
+          books.splice(i, 1);
+          render();
+          status('', 'Removed. Click Save to persist.');
+        }
+      };
+
+      updateCount();
+    }
+
+    /* ── LOAD ── */
+    async function load() {
+      status('loading', 'Loading books…');
+      try {
+        const res = await fetch('/api/books');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        books = await res.json();
+        render();
+        status('ok', `${books.length} books loaded.`);
+      } catch {
+        status('error', 'Cannot reach server. Run: npm start');
+      }
+    }
+
+    /* ── ADD ROW ── */
+    function addRow() {
+      books.unshift({ book_name: '', author: '', genre: '', about: '' });
+      render();
+      document.querySelector('#tbody .row-main .cell-input')?.focus();
+      status('', 'New row added — fill in details then Save.');
+    }
+
+    /* ── SAVE ── */
+    async function saveBooks() {
+      const btn = document.getElementById('btn-save');
+      btn.disabled = true;
+      status('loading', 'Saving…');
+      try {
+        const res  = await fetch('/api/books', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify(books),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        status('ok', `Saved — ${data.count} books written to books.json.`);
+      } catch (err) {
+        status('error', `Save failed: ${err.message}`);
+      }
+      btn.disabled = false;
+    }
+
+    /* ── PUSH ── */
+    async function pushToGitHub() {
+      const btn = document.getElementById('btn-push');
+      btn.disabled = true;
+
+      status('loading', 'Saving before push…');
+      try {
+        const s = await fetch('/api/books', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(books),
+        });
+        if (!s.ok) throw new Error('Save failed.');
+      } catch (err) {
+        status('error', err.message);
+        btn.disabled = false;
+        return;
+      }
+
+      status('loading', 'Pushing to GitHub…');
+      try {
+        const res  = await fetch('/api/push', { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        status('ok', data.message);
+      } catch (err) {
+        status('error', `Push failed: ${err.message}`);
+      }
+      btn.disabled = false;
+    }
+
+    /* ── KEYBOARD SHORTCUT ── */
+    document.addEventListener('keydown', e => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+        e.preventDefault();
+        saveBooks();
+      }
+    });
+
+    load();
+  </script>
+</body>
+</html>

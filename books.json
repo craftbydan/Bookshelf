@@ -1,0 +1,494 @@
+[
+  {
+    "book_name": "The Diary of a CEO",
+    "genre": "Self-Help / Business",
+    "author": "Steven Bartlett",
+    "about": "Self-help guide offering 33 laws of business and life based on psychology, behavioral science, and interviews with successful entrepreneurs."
+  },
+  {
+    "book_name": "The Last Bookshop in London",
+    "genre": "Historical Fiction",
+    "author": "Madeline Martin",
+    "about": "WWII historical fiction set in a London bookshop that survives the Blitz, exploring the power of literature to unite communities during wartime."
+  },
+  {
+    "book_name": "Supremacy",
+    "genre": "Non-Fiction / Technology",
+    "author": "Parmy Olson",
+    "about": "Examines the competitive race between AI powerhouses OpenAI and DeepMind, exploring the stakes of artificial intelligence development."
+  },
+  {
+    "book_name": "Hercule Poirot's Christmas",
+    "genre": "Mystery / Crime Fiction",
+    "author": "Agatha Christie",
+    "about": "Detective Hercule Poirot investigates a brutal murder during a family Christmas gathering at a wealthy patriarch's estate."
+  },
+  {
+    "book_name": "The Mysterious Affair at Styles",
+    "genre": "Mystery / Crime Fiction",
+    "author": "Agatha Christie",
+    "about": "Christie's debut novel featuring Hercule Poirot investigating a poisoning death at an English country house."
+  },
+  {
+    "book_name": "And Then There Were None",
+    "genre": "Mystery / Crime Fiction",
+    "author": "Agatha Christie",
+    "about": "Ten strangers are lured to an island and murdered one by one according to an ominous nursery rhyme."
+  },
+  {
+    "book_name": "The Big Four",
+    "genre": "Mystery / Crime Fiction",
+    "author": "Agatha Christie",
+    "about": "Hercule Poirot pursues an international crime syndicate known as the Big Four across continents."
+  },
+  {
+    "book_name": "Peril at End House",
+    "genre": "Mystery / Crime Fiction",
+    "author": "Agatha Christie",
+    "about": "Hercule Poirot investigates multiple attempts on the life of a young woman at her clifftop mansion."
+  },
+  {
+    "book_name": "The Body in the Library",
+    "genre": "Mystery / Crime Fiction",
+    "author": "Agatha Christie",
+    "about": "Miss Marple investigates when a dead woman is discovered in the library of a respectable country house."
+  },
+  {
+    "book_name": "Murder on the Orient Express",
+    "genre": "Mystery / Crime Fiction",
+    "author": "Agatha Christie",
+    "about": "Hercule Poirot solves a murder aboard a snowbound luxury train with twelve suspects."
+  },
+  {
+    "book_name": "Death on the Nile",
+    "genre": "Mystery / Crime Fiction",
+    "author": "Agatha Christie",
+    "about": "Hercule Poirot investigates a murder aboard a river cruise ship in Egypt amidst motives of love and money."
+  },
+  {
+    "book_name": "The Murder of Roger Ackroyd",
+    "genre": "Mystery / Crime Fiction",
+    "author": "Agatha Christie",
+    "about": "Hercule Poirot investigates a murder in an English village, featuring one of mystery fiction's most shocking twists."
+  },
+  {
+    "book_name": "Evil Under the Sun",
+    "genre": "Mystery / Crime Fiction",
+    "author": "Agatha Christie",
+    "about": "Hercule Poirot solves a murder at a seaside resort where a glamorous woman is found dead on a beach."
+  },
+  {
+    "book_name": "Hallowe'en Party",
+    "genre": "Mystery / Crime Fiction",
+    "author": "Agatha Christie",
+    "about": "Hercule Poirot investigates when a young girl is murdered at a Halloween party after claiming she witnessed a killing."
+  },
+  {
+    "book_name": "Dumb Witness",
+    "genre": "Mystery / Crime Fiction",
+    "author": "Agatha Christie",
+    "about": "Hercule Poirot uncovers a murder disguised as an accident at a country house where a dog may hold the key."
+  },
+  {
+    "book_name": "The Murder at the Vicarage",
+    "genre": "Mystery / Crime Fiction",
+    "author": "Agatha Christie",
+    "about": "Miss Marple's first full-length appearance as she helps solve the murder of a disliked man in her village."
+  },
+  {
+    "book_name": "Five Little Pigs",
+    "genre": "Mystery / Crime Fiction",
+    "author": "Agatha Christie",
+    "about": "Hercule Poirot reopens a sixteen-year-old murder case, interviewing five suspects to uncover the true killer."
+  },
+  {
+    "book_name": "The ABC Murders",
+    "genre": "Mystery / Crime Fiction",
+    "author": "Agatha Christie",
+    "about": "Hercule Poirot pursues a serial killer who selects victims alphabetically across England, leaving ABC railway guides as clues."
+  },
+  {
+    "book_name": "The Water Mill House Murders",
+    "genre": "Mystery / Detective Fiction",
+    "author": "Yukito Ayatsuji",
+    "about": "Honkaku mystery investigating impossible disappearances and murders at an isolated castle-like water mill house."
+  },
+  {
+    "book_name": "The Labyrinth House Murders",
+    "genre": "Mystery / Detective Fiction",
+    "author": "Yukito Ayatsuji",
+    "about": "Detectives probe a series of murders in an underground labyrinth mansion, solving elaborate locked-room puzzles."
+  },
+  {
+    "book_name": "The Decagon House Murders",
+    "genre": "Mystery / Detective Fiction",
+    "author": "Yukito Ayatsuji",
+    "about": "Seven university mystery club members visit a remote island with a ten-sided house, unraveling an impossible locked-room mystery."
+  },
+  {
+    "book_name": "Revenge Murder on Adashima Island",
+    "genre": "Mystery / Thriller",
+    "author": "Akane Araki",
+    "about": "Japanese mystery novel involving revenge and murder on a remote island setting."
+  },
+  {
+    "book_name": "Explosion",
+    "genre": "Psychological Thriller / Crime",
+    "author": "Go Kutsuhiro",
+    "about": "Japanese thriller exploring a bombing incident from multiple perspectives, examining the psychology of terrorism and justice."
+  },
+  {
+    "book_name": "The Thousand Cranes Murder Case",
+    "genre": "Mystery",
+    "author": "Mikito Chinen",
+    "about": "Japanese mystery novel featuring intricate criminal puzzles and deductive reasoning."
+  },
+  {
+    "book_name": "The Strange House of Eccentrics",
+    "genre": "Horror / Mystery",
+    "author": "Uketsu",
+    "about": "Mystery-horror novel structured around eerie architectural floor plans revealing hidden secrets within a deliberately designed house."
+  },
+  {
+    "book_name": "The Mysterious Painting and the Hunt for the Killer",
+    "genre": "Horror / Mystery",
+    "author": "Uketsu",
+    "about": "Mystery-horror spanning decades with interconnected stories revealed through mysterious drawings and paintings."
+  },
+  {
+    "book_name": "Death Among the Undead",
+    "genre": "Mystery / Horror",
+    "author": "Masahiro Imamura",
+    "about": "Japanese mystery blending zombie horror with fair-play whodunnit logic, featuring locked-room murder amid a supernatural siege."
+  },
+  {
+    "book_name": "The Killer's Shopping List",
+    "genre": "Thriller / Mystery",
+    "author": "Kang Ji-young",
+    "about": "Korean thriller following the investigation of a murder connected to a shopping list, adapted into a popular TV series."
+  },
+  {
+    "book_name": "Time to Tell the Truth",
+    "genre": "Mystery",
+    "author": "Yuki Shinichiro",
+    "about": "Collection of mystery short stories featuring elaborate plot twists centered on secrets and deception."
+  },
+  {
+    "book_name": "Mad",
+    "genre": "Thriller",
+    "author": "Chloe Esposito",
+    "about": "A woman impersonates her twin sister after she dies, uncovering mafia connections and deadly secrets during a chaotic week in Sicily."
+  },
+  {
+    "book_name": "The Housemaid",
+    "genre": "Thriller",
+    "author": "Freida McFadden",
+    "about": "A young woman takes a job as a live-in housekeeper for a wealthy family but discovers disturbing secrets within the household."
+  },
+  {
+    "book_name": "The Housemaid's Secret",
+    "genre": "Thriller",
+    "author": "Freida McFadden",
+    "about": "Sequel following the housemaid into a new job where she uncovers even more dangerous secrets and a hidden past."
+  },
+  {
+    "book_name": "Never Lie",
+    "genre": "Thriller",
+    "author": "Freida McFadden",
+    "about": "A newlywed couple gets trapped in a remote house during a snowstorm, discovering disturbing recordings from a missing psychiatrist."
+  },
+  {
+    "book_name": "We Used to Live Here",
+    "genre": "Horror / Thriller",
+    "author": "Marcus Kliewer",
+    "about": "A couple's house-flipping project is disrupted when strangers arrive claiming to have grown up there, leading to supernatural horror."
+  },
+  {
+    "book_name": "Crime Orient",
+    "genre": "Detective Fiction",
+    "author": "Kittisak Kongka",
+    "about": "Thai detective fiction exploring crime investigations, part of the Twin Detective series."
+  },
+  {
+    "book_name": "Radioactive Code",
+    "genre": "Detective Fiction",
+    "author": "Kittisak Kongka",
+    "about": "Thai detective novel involving criminal investigations with high-stakes scientific danger."
+  },
+  {
+    "book_name": "The Suicide Shop",
+    "genre": "Dark Comedy / Literary Fiction",
+    "author": "Jean Teulé",
+    "about": "Dark comedy about a family-run shop specializing in suicide products, disrupted when their youngest child is born irrepressibly happy."
+  },
+  {
+    "book_name": "The Gambler",
+    "genre": "Literary Fiction",
+    "author": "Fyodor Dostoevsky",
+    "about": "Semi-autobiographical novella following a man caught in obsessive gambling addiction and its destructive consequences."
+  },
+  {
+    "book_name": "The Inconvenient Convenience Store",
+    "genre": "Literary Fiction",
+    "author": "Kim Ho-yeon (김호연)",
+    "about": "A homeless man finds redemption working at a convenience store, impacting the lives of regular customers in heartwarming ways."
+  },
+  {
+    "book_name": "The Ark",
+    "genre": "Mystery / Thriller",
+    "author": "Haruo Yuki",
+    "about": "Trapped in a flooding underground building after an earthquake, a group must identify a murderer among them to escape."
+  },
+  {
+    "book_name": "The Fortune-Telling Cat of Café Marnel",
+    "genre": "Fiction / Light Novel",
+    "author": "Hatsuki Hoto",
+    "about": "Japanese light fiction featuring a cat with fortune-telling abilities at a charming café, blending mystery and whimsy."
+  },
+  {
+    "book_name": "How to Solve Your Own Murder",
+    "genre": "Mystery",
+    "author": "Kristen Perrin",
+    "about": "A darkly comedic mystery where a woman who spent decades preparing for her predicted murder is finally found dead."
+  },
+  {
+    "book_name": "The Cherry Robbers",
+    "genre": "Gothic Fiction",
+    "author": "Sarai Walker",
+    "about": "Gothic tale exploring a cursed family of sisters in 1950s Connecticut where each bride meets a tragic fate."
+  },
+  {
+    "book_name": "The Virgin Suicides",
+    "genre": "Literary Fiction",
+    "author": "Jeffrey Eugenides",
+    "about": "Neighborhood boys obsessively piece together the mystery of five sisters' suicides in 1970s suburban Michigan."
+  },
+  {
+    "book_name": "The Theory of Everything Else",
+    "genre": "Non-Fiction / Humor",
+    "author": "Dan Schreiber",
+    "about": "Humorous exploration of obscure scientific theories, eccentric inventors, and cultural phenomena outside mainstream knowledge."
+  },
+  {
+    "book_name": "The Art of Reading Minds",
+    "genre": "Self-Help / Psychology",
+    "author": "Henrik Fexeus",
+    "about": "Guide to understanding human behavior and body language to better interpret what others are thinking and feeling."
+  },
+  {
+    "book_name": "Attention Span",
+    "genre": "Self-Help / Psychology",
+    "author": "Gloria Mark",
+    "about": "Explores how digital technology affects human concentration and offers science-backed strategies to manage attention."
+  },
+  {
+    "book_name": "Hyperfocus",
+    "genre": "Self-Help / Productivity",
+    "author": "Chris Bailey",
+    "about": "Practical guide to managing attention and achieving deep focus for greater productivity and creativity."
+  },
+  {
+    "book_name": "Make Time",
+    "genre": "Self-Help / Productivity",
+    "author": "Jake Knapp",
+    "about": "Productivity guide offering daily strategies and experiments to reclaim time and focus on what truly matters."
+  },
+  {
+    "book_name": "The Courage to Be Disliked",
+    "genre": "Self-Help / Philosophy",
+    "author": "Ichiro Kishimi",
+    "about": "Dialogue-based book applying Adlerian psychology to overcome self-doubt, free yourself from others' expectations, and live authentically."
+  },
+  {
+    "book_name": "Is Math Real?",
+    "genre": "Non-Fiction / Mathematics",
+    "author": "Eugenia Cheng",
+    "about": "Explores the philosophical nature of mathematics and whether it exists independently or is a human invention."
+  },
+  {
+    "book_name": "100 Thinking Habits of Smart People",
+    "genre": "Self-Help / Personal Development",
+    "author": "Takashi Saito (齋藤孝)",
+    "about": "Japanese self-help guide presenting mental habits and thinking patterns practiced by highly effective individuals."
+  },
+  {
+    "book_name": "Finish a Day's Work in 3 Hours",
+    "genre": "Self-Help / Productivity",
+    "author": "Yamamoto Nobuaki (山本憲明)",
+    "about": "Japanese productivity guide offering time-management techniques to eliminate waste and maximize work efficiency."
+  },
+  {
+    "book_name": "How to Argue with a Cat",
+    "genre": "Self-Help / Communication",
+    "author": "Jay Heinrichs",
+    "about": "Humorous guide to persuasion and logical reasoning using cats as examples to teach rhetoric and argumentation."
+  },
+  {
+    "book_name": "How to Give Zero F*cks",
+    "genre": "Self-Help / Humor",
+    "author": "Stephen Wildish",
+    "about": "Illustrated guide to mental freedom through letting go of unhelpful concerns and expectations."
+  },
+  {
+    "book_name": "Feel-Good Productivity",
+    "genre": "Self-Help / Productivity",
+    "author": "Ali Abdaal",
+    "about": "Explores how productivity comes from positive emotions rather than discipline, featuring energizers, blockers, and sustainers."
+  },
+  {
+    "book_name": "The Get Things Done Book",
+    "genre": "Self-Help / Productivity",
+    "author": "Mikael Krogerus",
+    "about": "Compiles 41 practical productivity tools including Pomodoro and Kanban, distilled to essential techniques for managing tasks."
+  },
+  {
+    "book_name": "The Visual MBA",
+    "genre": "Business / Education",
+    "author": "Jason Barron",
+    "about": "Presents two years of business school concepts through sketch notes covering marketing, finance, operations, and strategy."
+  },
+  {
+    "book_name": "The Psychology of Money",
+    "genre": "Personal Finance / Non-Fiction",
+    "author": "Morgan Housel",
+    "about": "Explores how psychology and emotions shape financial decision-making and the relationship between money and behavior."
+  },
+  {
+    "book_name": "Longtunman 3.0",
+    "genre": "Investment / Finance",
+    "author": "Longtunman",
+    "about": "Thai investment guide from popular financial media brand covering investment strategies, business analysis, and financial literacy."
+  },
+  {
+    "book_name": "What Money Can't Buy",
+    "genre": "Philosophy / Ethics",
+    "author": "Michael J. Sandel",
+    "about": "Examines the moral boundaries of markets, exploring what should and shouldn't be for sale in a just society."
+  },
+  {
+    "book_name": "Money 101",
+    "genre": "Personal Finance",
+    "author": "Jakkapong Mesaphan",
+    "about": "Thai personal finance guide teaching money management, building reserves, managing risks, and achieving financial well-being."
+  },
+  {
+    "book_name": "Money",
+    "genre": "Non-Fiction / History",
+    "author": "Yuval Noah Harari",
+    "about": "Illustrated extract from Sapiens tracing the history of money from the first coins to modern economics."
+  },
+  {
+    "book_name": "The Maid",
+    "genre": "Mystery / Fiction",
+    "author": "Nita Prose",
+    "about": "A socially awkward hotel maid becomes the prime suspect when she discovers a wealthy guest dead in his room."
+  },
+  {
+    "book_name": "Good-Bye",
+    "genre": "Literary Fiction",
+    "author": "Osamu Dazai",
+    "about": "Unfinished tragicomedy novella about a man trying to end his multiple romantic affairs in post-war Japan."
+  },
+  {
+    "book_name": "Stop Procrastinating and Just Do It",
+    "genre": "Self-Help",
+    "author": "Hotta Shugo (堀田秀吾)",
+    "about": "Japanese self-help book on overcoming procrastination using science-backed methods to take immediate action."
+  },
+  {
+    "book_name": "The Kamogawa Food Detectives",
+    "genre": "Fiction / Mystery",
+    "author": "Hisashi Kashiwai",
+    "about": "A father-daughter duo in Kyoto solve emotional mysteries by recreating meaningful dishes from their clients' memories."
+  },
+  {
+    "book_name": "Arsène Lupin vs Herlock Sholmes",
+    "genre": "Mystery / Adventure",
+    "author": "Maurice Leblanc",
+    "about": "French master thief Arsène Lupin faces off against the brilliant detective Herlock Sholmes in a battle of wits."
+  },
+  {
+    "book_name": "Arsène Lupin, Gentleman Burglar",
+    "genre": "Mystery / Adventure",
+    "author": "Maurice Leblanc",
+    "about": "Collection of stories featuring the charming and sophisticated gentleman thief pulling off elaborate heists across France."
+  },
+  {
+    "book_name": "A Short History of Nearly Everything",
+    "genre": "Non-Fiction / Science",
+    "author": "Bill Bryson",
+    "about": "Accessible and witty exploration of science covering everything from the Big Bang to modern discoveries."
+  },
+  {
+    "book_name": "Murdle",
+    "genre": "Puzzle / Mystery",
+    "author": "G.T. Karber",
+    "about": "Collection of murder mystery logic puzzles combining deductive reasoning with grid-based problem-solving."
+  },
+  {
+    "book_name": "The Return of Sherlock Holmes",
+    "genre": "Mystery / Detective Fiction",
+    "author": "Arthur Conan Doyle",
+    "about": "Collection of thirteen stories featuring Holmes' dramatic return from apparent death and subsequent investigations."
+  },
+  {
+    "book_name": "His Last Bow",
+    "genre": "Mystery / Detective Fiction",
+    "author": "Arthur Conan Doyle",
+    "about": "Collection of stories featuring Holmes' later cases, including his final adventure during World War I."
+  },
+  {
+    "book_name": "The Casebook of Sherlock Holmes",
+    "genre": "Mystery / Detective Fiction",
+    "author": "Arthur Conan Doyle",
+    "about": "The final collection of Sherlock Holmes short stories showcasing the detective's later investigations."
+  },
+  {
+    "book_name": "The Hound of the Baskervilles",
+    "genre": "Mystery / Detective Fiction",
+    "author": "Arthur Conan Doyle",
+    "about": "Holmes investigates a supernatural curse and mysterious hound plaguing the Baskerville family on the Devon moors."
+  },
+  {
+    "book_name": "The Valley of Fear",
+    "genre": "Mystery / Detective Fiction",
+    "author": "Arthur Conan Doyle",
+    "about": "A locked-room murder mystery intertwined with an American mining town conspiracy uncovered by Holmes and Watson."
+  },
+  {
+    "book_name": "The Adventures of Sherlock Holmes",
+    "genre": "Mystery / Detective Fiction",
+    "author": "Arthur Conan Doyle",
+    "about": "The first collection of twelve short stories establishing Holmes' legendary deductive methods and iconic cases."
+  },
+  {
+    "book_name": "The Memoirs of Sherlock Holmes",
+    "genre": "Mystery / Detective Fiction",
+    "author": "Arthur Conan Doyle",
+    "about": "Collection of eleven stories concluding with Holmes' apparent death at Reichenbach Falls battling Professor Moriarty."
+  },
+  {
+    "book_name": "The Sign of the Four",
+    "genre": "Mystery / Detective Fiction",
+    "author": "Arthur Conan Doyle",
+    "about": "Holmes and Watson unravel a murder mystery connected to stolen treasure from the Indian Rebellion."
+  },
+  {
+    "book_name": "A Study in Scarlet",
+    "genre": "Mystery / Detective Fiction",
+    "author": "Arthur Conan Doyle",
+    "about": "The first Sherlock Holmes novel, introducing the detective and Watson as they solve a puzzling murder with American connections."
+  },
+  {
+    "book_name": "Think and Grow Rich",
+    "genre": "Self-Help / Personal Finance",
+    "author": "Napoleon Hill",
+    "about": "Classic self-help book outlining a philosophy of success through desire, faith, visualization, and persistent effort."
+  },
+  {
+    "book_name": "Selling with Heart: Osaka Merchant Style",
+    "genre": "Business",
+    "author": "Kenji Nakamura",
+    "about": "Japanese business book exploring Osaka merchant philosophy and principles of ethical, people-centered sales and commerce."
+  }
+]

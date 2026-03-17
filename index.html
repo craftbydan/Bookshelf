@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0F0F11" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="apple-mobile-web-app-title" content="Dan's Library" />
+  <title>Dan's Library</title>
+  <style>
+    body { margin: 0; background: #0F0F11; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo, useRef } = React;
+
+    /* ─────────────────────────────────────────────────────────────
+       STYLES
+    ───────────────────────────────────────────────────────────── */
+    const CSS = `
+      @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;1,400;1,500&family=Space+Grotesk:wght@300;400;500;600&family=Space+Mono:wght@400&display=swap');
+
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html, body {
+        min-height: 100%;
+        min-height: 100dvh;
+      }
+
+      body {
+        background: #0F0F11;
+        color: #DDDBD5;
+        font-family: 'Space Grotesk', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        overscroll-behavior: none;
+      }
+
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(
+          ellipse 100% 70% at 50% 0%,
+          rgba(255, 255, 255, 0.02) 0%,
+          transparent 60%
+        );
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        pointer-events: none;
+        opacity: 0.035;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23g)'/%3E%3C/svg%3E");
+        background-repeat: repeat;
+        background-size: 200px 200px;
+      }
+
+      ::selection { background: rgba(221, 219, 213, 0.15); }
+
+      /* ── PAGE ── */
+      .shelf-page {
+        position: relative;
+        z-index: 1;
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 0 1.25rem;
+        /* Safe area for iPhone notch/home bar */
+        padding-left: max(1.25rem, env(safe-area-inset-left));
+        padding-right: max(1.25rem, env(safe-area-inset-right));
+      }
+
+      /* ── HEADER ── */
+      .shelf-header {
+        padding: 1.5rem 0 1.25rem;
+        padding-top: max(1.5rem, env(safe-area-inset-top));
+        border-bottom: 1px solid rgba(221, 219, 213, 0.09);
+      }
+
+      .shelf-header-top {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 0.4rem;
+      }
+
+      .shelf-label {
+        font-size: 11px;
+        font-weight: 400;
+        letter-spacing: 0.14em;
+        color: rgba(221, 219, 213, 0.28);
+        text-transform: uppercase;
+      }
+
+      /* Space Mono only for the clock — stable digit width */
+      .shelf-clock {
+        font-family: 'Space Mono', monospace;
+        font-size: 11px;
+        color: rgba(221, 219, 213, 0.3);
+        letter-spacing: 0.04em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .shelf-header-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .shelf-name {
+        font-size: 24px;
+        font-weight: 500;
+        color: #DDDBD5;
+        letter-spacing: -0.04em;
+      }
+
+      .shelf-status {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 11px;
+        font-weight: 400;
+        letter-spacing: 0.1em;
+        color: rgba(221, 219, 213, 0.28);
+        text-transform: uppercase;
+      }
+
+      .status-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+
+      .status-dot.open   { background: rgba(140, 220, 140, 0.65); }
+      .status-dot.closed { background: rgba(220, 100, 100, 0.55); }
+
+      /* ── STICKY CONTROLS ──
+         Both the genre filter and search bar stick together as one unit.
+      */
+      .sticky-controls {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: #0F0F11;
+        box-shadow: 0 16px 32px #0F0F11;
+      }
+
+      /* ── GENRE FILTER ── */
+      .genre-filter {
+        padding: 0.9rem 0 0.75rem;
+        border-bottom: 1px solid rgba(221, 219, 213, 0.08);
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 0;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+
+      .genre-filter::-webkit-scrollbar { display: none; }
+
+      .genre-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 11px;
+        font-weight: 400;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: rgba(221, 219, 213, 0.25);
+        /* 44px min touch target height */
+        min-height: 44px;
+        padding: 0 0;
+        margin-right: 1.4rem;
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        transition: color 0.12s;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .genre-btn:active { color: rgba(221, 219, 213, 0.7); }
+
+      .genre-btn.is-active {
+        font-weight: 500;
+      }
+
+      .genre-count {
+        font-size: 10px;
+        font-weight: 300;
+        opacity: 0.45;
+      }
+
+      /* ── SEARCH + SORT ROW ── */
+      .search-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0;
+        border-bottom: 1px solid rgba(221, 219, 213, 0.08);
+      }
+
+      .search-input {
+        flex: 1;
+        background: none;
+        border: none;
+        outline: none;
+        font-family: 'Space Grotesk', sans-serif;
+        /* 16px prevents iOS auto-zoom on focus */
+        font-size: 16px;
+        font-weight: 300;
+        color: #DDDBD5;
+        letter-spacing: -0.01em;
+        padding: 0.85rem 0;
+        min-height: 44px;
+        -webkit-appearance: none;
+      }
+
+      .search-input::placeholder {
+        color: rgba(221, 219, 213, 0.2);
+      }
+
+      .search-clear {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        line-height: 1;
+        color: rgba(221, 219, 213, 0.35);
+        padding: 0.5rem;
+        margin-right: -0.5rem;
+        min-width: 44px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-tap-highlight-color: transparent;
+        transition: color 0.1s;
+      }
+
+      .search-clear:active { color: #DDDBD5; }
+
+      .sort-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 11px;
+        font-weight: 400;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: rgba(221, 219, 213, 0.25);
+        white-space: nowrap;
+        padding: 0.5rem 0;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        transition: color 0.12s;
+        flex-shrink: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .sort-btn:active { color: rgba(221, 219, 213, 0.7); }
+
+      .sort-btn.is-active {
+        color: #DDDBD5;
+        font-weight: 500;
+      }
+
+      /* ── BOOKS ── */
+      .shelf-books {
+        padding: 0;
+      }
+
+      /*
+        Hover dim — pointer devices only.
+        Touch screens don't have hover, so this won't fire on mobile.
+      */
+      @media (hover: hover) {
+        .shelf-books:hover .book-entry { opacity: 0.3; }
+        .shelf-books:hover .book-entry:hover { opacity: 1; }
+        .book-entry { transition: opacity 0.18s ease; }
+      }
+
+      /* Tap feedback on touch */
+      @media (hover: none) {
+        .book-entry:active { background: rgba(221, 219, 213, 0.03); }
+      }
+
+      .book-entry {
+        padding: 1.4rem 0 1.4rem 0.85rem;
+        border-top: 1px solid rgba(221, 219, 213, 0.08);
+        border-left: 2px solid var(--gc, rgba(221,219,213,0.07));
+        cursor: default;
+      }
+
+      .book-entry:first-child { border-top: none; }
+
+      .book-title {
+        font-size: 22px;
+        font-weight: 500;
+        line-height: 1.15;
+        letter-spacing: -0.025em;
+        color: #DDDBD5;
+      }
+
+      .book-meta {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0 0.4rem;
+        font-size: 13px;
+        font-weight: 300;
+        color: rgba(221, 219, 213, 0.38);
+        margin-top: 0.4rem;
+      }
+
+      .book-meta-sep { opacity: 0.3; }
+
+      .book-genre {
+        font-weight: 400;
+        color: var(--gc, rgba(221,219,213,0.45));
+        opacity: 0.75;
+      }
+
+      /* Expand indicator — right-aligned, barely there */
+      .book-expand-hint {
+        margin-left: auto;
+        font-size: 14px;
+        font-weight: 300;
+        color: rgba(221, 219, 213, 0.22);
+        line-height: 1;
+        transition: color 0.15s;
+        flex-shrink: 0;
+      }
+
+      .book-entry.has-about { cursor: pointer; }
+
+      .book-entry.is-open .book-expand-hint {
+        color: rgba(221, 219, 213, 0.45);
+      }
+
+      /*
+        About section — grid animation to unknown height.
+        grid-template-rows: 0fr → 1fr is the cleanest CSS-only
+        approach that works without JS height measurement.
+      */
+      .book-about {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows 0.28s ease;
+      }
+
+      .book-entry.is-open .book-about {
+        grid-template-rows: 1fr;
+      }
+
+      .book-about-inner {
+        overflow: hidden;
+      }
+
+      .book-about-text {
+        font-size: 13px;
+        font-weight: 300;
+        line-height: 1.65;
+        color: rgba(221, 219, 213, 0.45);
+        padding-top: 0.7rem;
+        margin-top: 0.7rem;
+        border-top: 1px solid rgba(221, 219, 213, 0.07);
+      }
+
+      /* Empty state */
+      .no-results {
+        padding: 3rem 0 2rem;
+        font-size: 14px;
+        font-weight: 300;
+        color: rgba(221, 219, 213, 0.25);
+        letter-spacing: 0.02em;
+      }
+
+      /* ── FOOTER ── */
+      .shelf-footer {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        padding: 1.75rem 0;
+        /* Home bar safe area on iPhone */
+        padding-bottom: max(1.75rem, calc(env(safe-area-inset-bottom) + 1rem));
+        border-top: 1px solid rgba(221, 219, 213, 0.08);
+        margin-top: 0.5rem;
+      }
+
+      .footer-lib {
+        font-size: 11px;
+        font-weight: 400;
+        color: rgba(221, 219, 213, 0.18);
+        letter-spacing: -0.01em;
+      }
+
+      .footer-count {
+        font-size: 11px;
+        font-weight: 300;
+        color: rgba(221, 219, 213, 0.18);
+        letter-spacing: 0.06em;
+      }
+
+      /* ── LARGER SCREENS ── */
+      @media (min-width: 560px) {
+        .shelf-page  { padding-left: 2.5rem; padding-right: 2.5rem; }
+        .shelf-header { padding-top: 2.25rem; }
+        .book-title  { font-size: 26px; }
+      }
+
+      /* ════════════════════════════════════════
+         GENRE ATMOSPHERE
+         Fixed layers behind all content.
+         Each genre shifts the ambient glow color.
+         Mystery / Thriller / Horror get drip bar.
+      ════════════════════════════════════════ */
+
+      /* Ambient colored glow from top */
+      .atm-glow {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0;
+        transition: background 0.55s ease, opacity 0.55s ease;
+      }
+      body[data-genre] .atm-glow { opacity: 1; }
+
+      body[data-genre="Mystery"]    .atm-glow { background: radial-gradient(ellipse 95% 55% at 50% -5%, rgba(196,162,78,0.15) 0%, transparent 65%); }
+      body[data-genre="Thriller"]   .atm-glow { background: radial-gradient(ellipse 95% 55% at 50% -5%, rgba(192,80,80,0.18) 0%, transparent 65%); }
+      body[data-genre="Horror"]     .atm-glow { background: radial-gradient(ellipse 95% 65% at 50% -5%, rgba(120,48,160,0.20) 0%, transparent 70%); }
+      body[data-genre="Fiction"]    .atm-glow { background: radial-gradient(ellipse 95% 55% at 50% -5%, rgba(139,126,200,0.13) 0%, transparent 65%); }
+      body[data-genre="Self-Help"]  .atm-glow { background: radial-gradient(ellipse 95% 55% at 50% -5%, rgba(95,173,130,0.13) 0%, transparent 65%); }
+      body[data-genre="Finance"]    .atm-glow { background: radial-gradient(ellipse 95% 55% at 50% -5%, rgba(78,160,160,0.13) 0%, transparent 65%); }
+      body[data-genre="Non-Fiction"].atm-glow { background: radial-gradient(ellipse 95% 55% at 50% -5%, rgba(104,144,200,0.13) 0%, transparent 65%); }
+      body[data-genre="Business"]   .atm-glow { background: radial-gradient(ellipse 95% 55% at 50% -5%, rgba(200,150,96,0.13) 0%, transparent 65%); }
+      body[data-genre="Philosophy"] .atm-glow { background: radial-gradient(ellipse 95% 55% at 50% -5%, rgba(160,136,96,0.13) 0%, transparent 65%); }
+
+      /* Thriller: slow crimson heartbeat */
+      @keyframes atm-threat {
+        0%, 100% { opacity: 0.8; }
+        50%       { opacity: 1;   }
+      }
+      body[data-genre="Thriller"] .atm-glow {
+        animation: atm-threat 3s ease-in-out infinite;
+      }
+
+      /* Horror: dark vignette from edges */
+      .atm-vignette {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 1;
+        opacity: 0;
+        transition: opacity 0.7s ease;
+        background: radial-gradient(ellipse 85% 85% at 50% 50%, transparent 35%, rgba(0,0,0,0.6) 100%);
+      }
+      body[data-genre="Horror"] .atm-vignette { opacity: 1; }
+
+      /* Drip bar — slides in from above for dark genres */
+      .atm-drip {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 100px;
+        pointer-events: none;
+        z-index: 5;
+        transform: translateY(-105%);
+        transition: transform 0.7s cubic-bezier(0.34, 1.1, 0.64, 1);
+      }
+      body[data-genre="Mystery"] .atm-drip {
+        transform: translateY(0);
+      }
+
+      /* ────────────────────────────────────────────
+         PER-GENRE SIGNATURE EFFECTS
+         Each genre has one totally unique surprise.
+      ──────────────────────────────────────────── */
+
+      /* Shared texture layer (behind content) */
+      .atm-fx {
+        position: fixed; inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0;
+        transition: opacity 0.55s ease;
+      }
+
+      /* Mystery — old film scanlines scrolling over everything */
+      @keyframes atm-scan {
+        from { background-position: 0 0; }
+        to   { background-position: 0 6px; }
+      }
+      body[data-genre="Mystery"] .atm-fx {
+        z-index: 4;
+        background: repeating-linear-gradient(
+          to bottom,
+          transparent 0px, transparent 5px,
+          rgba(0,0,0,0.09) 5px, rgba(0,0,0,0.09) 6px
+        );
+        animation: atm-scan 0.12s linear infinite;
+        opacity: 0.5;
+      }
+
+      /* Thriller — screen micro-tremble every few seconds */
+      @keyframes atm-shake {
+        0%,87%,100% { transform: translate(0,0); }
+        88% { transform: translate(-2px, 1px) rotate(-0.15deg); }
+        89% { transform: translate(3px, -1px) rotate(0.15deg); }
+        90% { transform: translate(-2px, 2px); }
+        91% { transform: translate(2px, -1px); }
+        92% { transform: translate(-1px, 0px); }
+        93% { transform: translate(0,0); }
+      }
+      body[data-genre="Thriller"] .shelf-page {
+        animation: atm-shake 5s ease-in-out infinite;
+      }
+
+      /* Horror — book titles flicker like dying electricity */
+      @keyframes atm-flicker {
+        0%,91%,100% { opacity: 1; }
+        92%  { opacity: 0.25; }
+        93%  { opacity: 1; }
+        94%  { opacity: 0.1; }
+        95%  { opacity: 0.9; }
+        96%  { opacity: 0.3; }
+        97%  { opacity: 1; }
+        98%  { opacity: 0.7; }
+        99%  { opacity: 1; }
+      }
+      body[data-genre="Horror"] .book-title {
+        animation: atm-flicker 5s ease-in-out infinite;
+      }
+
+      /* Thriller — red diagonal caution stripes across page */
+      body[data-genre="Thriller"] .atm-fx {
+        background-image: repeating-linear-gradient(
+          -45deg,
+          transparent,           transparent 24px,
+          rgba(200,56,56,0.055)  24px,
+          rgba(200,56,56,0.055)  25px
+        );
+        opacity: 1;
+      }
+
+      /* Horror — TV static: animated grain that shifts and cuts */
+      @keyframes atm-static {
+        0%   { background-position: 0 0; }
+        20%  { background-position: -60px 40px; }
+        40%  { background-position: 40px -30px; }
+        60%  { background-position: -30px -50px; }
+        80%  { background-position: 50px 20px; }
+        100% { background-position: -20px 10px; }
+      }
+      body[data-genre="Horror"] .atm-fx {
+        z-index: 4;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23g)'/%3E%3C/svg%3E");
+        background-size: 140px 140px;
+        animation: atm-static 0.07s steps(4) infinite;
+        opacity: 0.1;
+      }
+
+      /* Non-Fiction — dot matrix grid behind text */
+      body[data-genre="Non-Fiction"] .atm-fx {
+        background-image: radial-gradient(circle, rgba(104,144,200,0.15) 1px, transparent 1px);
+        background-size: 26px 26px;
+        opacity: 1;
+      }
+
+      /* Business — diagonal premium notebook lines */
+      body[data-genre="Business"] .atm-fx {
+        background-image: repeating-linear-gradient(
+          -55deg,
+          transparent, transparent 30px,
+          rgba(200,150,96,0.055) 30px,
+          rgba(200,150,96,0.055) 31px
+        );
+        opacity: 1;
+      }
+
+      /* Floating particles — Fiction, Self-Help, Finance, Philosophy */
+      .atm-particles {
+        position: fixed; inset: 0;
+        overflow: hidden;
+        pointer-events: none;
+        z-index: 2;
+      }
+      @keyframes atm-float-up {
+        from { transform: translateY(108vh); opacity: 0; }
+        10%  { opacity: 1; }
+        88%  { opacity: 0.6; }
+        to   { transform: translateY(-8vh); opacity: 0; }
+      }
+      @keyframes atm-fall-down {
+        from { transform: translateY(-8vh); opacity: 0; }
+        10%  { opacity: 1; }
+        88%  { opacity: 0.6; }
+        to   { transform: translateY(108vh); opacity: 0; }
+      }
+      .atm-particle {
+        position: absolute;
+        pointer-events: none;
+        user-select: none;
+        font-family: 'Space Grotesk', sans-serif;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+        animation-fill-mode: both;
+      }
+      .atm-particle--up   { animation-name: atm-float-up; }
+      .atm-particle--down { animation-name: atm-fall-down; }
+
+      /* ── PER-GENRE TITLE FONT ──────────────────────────
+         Only book titles switch — everything else stays.
+         "All" view = no data-genre = untouched Space Grotesk.
+      ─────────────────────────────────────────────────── */
+      body[data-genre="Mystery"]    .book-title {
+        font-family: 'Lora', serif;
+        font-style: italic;
+        font-weight: 400;
+        letter-spacing: 0;
+      }
+      body[data-genre="Thriller"]   .book-title {
+        font-weight: 600;
+        letter-spacing: -0.04em;
+        text-transform: uppercase;
+        font-size: 18px;
+      }
+      body[data-genre="Horror"]     .book-title {
+        font-family: 'Space Mono', monospace;
+        font-size: 16px;
+        letter-spacing: -0.02em;
+      }
+      body[data-genre="Fiction"]    .book-title {
+        font-family: 'Lora', serif;
+        font-weight: 400;
+        letter-spacing: 0.005em;
+      }
+      body[data-genre="Philosophy"] .book-title {
+        font-family: 'Lora', serif;
+        font-style: italic;
+        font-weight: 400;
+        letter-spacing: 0.01em;
+      }
+      body[data-genre="Finance"]    .book-title {
+        font-family: 'Space Mono', monospace;
+        font-size: 16px;
+        font-weight: 400;
+      }
+      body[data-genre="Non-Fiction"] .book-title {
+        font-weight: 300;
+        letter-spacing: 0.02em;
+      }
+      body[data-genre="Business"]   .book-title {
+        font-weight: 600;
+        letter-spacing: -0.03em;
+      }
+      body[data-genre="Self-Help"]  .book-title {
+        font-weight: 500;
+        letter-spacing: -0.01em;
+      }
+      .atm-drip::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        /* base bar + 10 pointed drip tips */
+        clip-path: polygon(
+          0% 0%, 100% 0%, 100% 16%,
+          94.5% 16%, 93% 28%, 91.5% 16%,
+          86.5% 16%, 85% 44%, 83.5% 16%,
+          73.5% 16%, 72% 58%, 70.5% 16%,
+          60.5% 16%, 59% 32%, 57.5% 16%,
+          47.5% 16%, 46% 76%, 44.5% 16%,
+          34.5% 16%, 33% 38%, 31.5% 16%,
+          23.5% 16%, 22% 62%, 20.5% 16%,
+          13.5% 16%, 12% 36%, 10.5% 16%,
+           5.5% 16%,  4% 52%,  2.5% 16%,
+          0% 16%
+        );
+        opacity: 0.9;
+      }
+      body[data-genre="Mystery"] .atm-drip::after { background: rgba(196,162,78,0.28); }
+    `;
+
+    function useStyles() {
+      useEffect(() => {
+        const existing = document.getElementById('shelf-styles');
+        if (existing) existing.remove();
+        const el = document.createElement('style');
+        el.id = 'shelf-styles';
+        el.textContent = CSS;
+        document.head.appendChild(el);
+        return () => el.remove();
+      }, []);
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+       CLOCK
+    ───────────────────────────────────────────────────────────── */
+    function Clock() {
+      const [now, setNow] = useState(() => new Date());
+      useEffect(() => {
+        const id = setInterval(() => setNow(new Date()), 1000);
+        return () => clearInterval(id);
+      }, []);
+      const pad = n => String(n).padStart(2, '0');
+      return (
+        <span className="shelf-clock">
+          {pad(now.getHours())}:{pad(now.getMinutes())}:{pad(now.getSeconds())}
+        </span>
+      );
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+       STATUS
+    ───────────────────────────────────────────────────────────── */
+    function Status() {
+      const isOpen = () => { const h = new Date().getHours(); return h >= 8 && h < 24; };
+      const [open, setOpen] = useState(isOpen);
+      useEffect(() => {
+        const id = setInterval(() => setOpen(isOpen()), 60000);
+        return () => clearInterval(id);
+      }, []);
+      return (
+        <span className="shelf-status">
+          <span className={`status-dot ${open ? 'open' : 'closed'}`} />
+          {open ? 'Open' : 'Closed'}
+        </span>
+      );
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+       BOOK ENTRY
+       Tapping anywhere on an entry with an `about` expands the
+       description. Uses CSS grid-template-rows for smooth animation
+       to unknown height — no JS measurement needed.
+    ───────────────────────────────────────────────────────────── */
+    function BookEntry({ book }) {
+      const [open, setOpen] = React.useState(false);
+      const hasAbout = !!book.about?.trim();
+      const color = genreColor(book.genre);
+
+      return (
+        <article
+          className={`book-entry${hasAbout ? ' has-about' : ''}${open ? ' is-open' : ''}`}
+          onClick={hasAbout ? () => setOpen(v => !v) : undefined}
+          style={color ? { '--gc': color } : undefined}
+        >
+          <h2 className="book-title">{book.title}</h2>
+          <div className="book-meta">
+            <span>{book.author}</span>
+            <span className="book-meta-sep">·</span>
+            <span className="book-genre">{book.genre}</span>
+            {hasAbout && (
+              <span className="book-expand-hint" aria-hidden="true">
+                {open ? '−' : '+'}
+              </span>
+            )}
+          </div>
+          {hasAbout && (
+            <div className="book-about">
+              <div className="book-about-inner">
+                <p className="book-about-text">{book.about}</p>
+              </div>
+            </div>
+          )}
+        </article>
+      );
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+       DATA — books.json embedded inline.
+       fetch('books.json') fails when opened as file://, so the
+       JSON is inlined here and mapped to { title, author, genre }.
+    ───────────────────────────────────────────────────────────── */
+    const RAW = [{"book_name":"The Diary of a CEO","genre":"Self-Help / Business","author":"Steven Bartlett","about":"Self-help guide offering 33 laws of business and life based on psychology, behavioral science, and interviews with successful entrepreneurs."},{"book_name":"The Last Bookshop in London","genre":"Historical Fiction","author":"Madeline Martin","about":"WWII historical fiction set in a London bookshop that survives the Blitz, exploring the power of literature to unite communities during wartime."},{"book_name":"Supremacy","genre":"Non-Fiction / Technology","author":"Parmy Olson","about":"Examines the competitive race between AI powerhouses OpenAI and DeepMind, exploring the stakes of artificial intelligence development."},{"book_name":"Hercule Poirot's Christmas","genre":"Mystery / Crime Fiction","author":"Agatha Christie","about":"Detective Hercule Poirot investigates a brutal murder during a family Christmas gathering at a wealthy patriarch's estate."},{"book_name":"The Mysterious Affair at Styles","genre":"Mystery / Crime Fiction","author":"Agatha Christie","about":"Christie's debut novel featuring Hercule Poirot investigating a poisoning death at an English country house."},{"book_name":"And Then There Were None","genre":"Mystery / Crime Fiction","author":"Agatha Christie","about":"Ten strangers are lured to an island and murdered one by one according to an ominous nursery rhyme."},{"book_name":"The Big Four","genre":"Mystery / Crime Fiction","author":"Agatha Christie","about":"Hercule Poirot pursues an international crime syndicate known as the Big Four across continents."},{"book_name":"Peril at End House","genre":"Mystery / Crime Fiction","author":"Agatha Christie","about":"Hercule Poirot investigates multiple attempts on the life of a young woman at her clifftop mansion."},{"book_name":"The Body in the Library","genre":"Mystery / Crime Fiction","author":"Agatha Christie","about":"Miss Marple investigates when a dead woman is discovered in the library of a respectable country house."},{"book_name":"Murder on the Orient Express","genre":"Mystery / Crime Fiction","author":"Agatha Christie","about":"Hercule Poirot solves a murder aboard a snowbound luxury train with twelve suspects."},{"book_name":"Death on the Nile","genre":"Mystery / Crime Fiction","author":"Agatha Christie","about":"Hercule Poirot investigates a murder aboard a river cruise ship in Egypt amidst motives of love and money."},{"book_name":"The Murder of Roger Ackroyd","genre":"Mystery / Crime Fiction","author":"Agatha Christie","about":"Hercule Poirot investigates a murder in an English village, featuring one of mystery fiction's most shocking twists."},{"book_name":"Evil Under the Sun","genre":"Mystery / Crime Fiction","author":"Agatha Christie","about":"Hercule Poirot solves a murder at a seaside resort where a glamorous woman is found dead on a beach."},{"book_name":"Hallowe'en Party","genre":"Mystery / Crime Fiction","author":"Agatha Christie","about":"Hercule Poirot investigates when a young girl is murdered at a Halloween party after claiming she witnessed a killing."},{"book_name":"Dumb Witness","genre":"Mystery / Crime Fiction","author":"Agatha Christie","about":"Hercule Poirot uncovers a murder disguised as an accident at a country house where a dog may hold the key."},{"book_name":"The Murder at the Vicarage","genre":"Mystery / Crime Fiction","author":"Agatha Christie","about":"Miss Marple's first full-length appearance as she helps solve the murder of a disliked man in her village."},{"book_name":"Five Little Pigs","genre":"Mystery / Crime Fiction","author":"Agatha Christie","about":"Hercule Poirot reopens a sixteen-year-old murder case, interviewing five suspects to uncover the true killer."},{"book_name":"The ABC Murders","genre":"Mystery / Crime Fiction","author":"Agatha Christie","about":"Hercule Poirot pursues a serial killer who selects victims alphabetically across England, leaving ABC railway guides as clues."},{"book_name":"The Water Mill House Murders","genre":"Mystery / Detective Fiction","author":"Yukito Ayatsuji","about":"Honkaku mystery investigating impossible disappearances and murders at an isolated castle-like water mill house."},{"book_name":"The Labyrinth House Murders","genre":"Mystery / Detective Fiction","author":"Yukito Ayatsuji","about":"Detectives probe a series of murders in an underground labyrinth mansion, solving elaborate locked-room puzzles."},{"book_name":"The Decagon House Murders","genre":"Mystery / Detective Fiction","author":"Yukito Ayatsuji","about":"Seven university mystery club members visit a remote island with a ten-sided house, unraveling an impossible locked-room mystery."},{"book_name":"Revenge Murder on Adashima Island","genre":"Mystery / Thriller","author":"Akane Araki","about":"Japanese mystery novel involving revenge and murder on a remote island setting."},{"book_name":"Explosion","genre":"Psychological Thriller / Crime","author":"Go Kutsuhiro","about":"Japanese thriller exploring a bombing incident from multiple perspectives, examining the psychology of terrorism and justice."},{"book_name":"The Thousand Cranes Murder Case","genre":"Mystery","author":"Mikito Chinen","about":"Japanese mystery novel featuring intricate criminal puzzles and deductive reasoning."},{"book_name":"The Strange House of Eccentrics","genre":"Horror / Mystery","author":"Uketsu","about":"Mystery-horror novel structured around eerie architectural floor plans revealing hidden secrets within a deliberately designed house."},{"book_name":"The Mysterious Painting and the Hunt for the Killer","genre":"Horror / Mystery","author":"Uketsu","about":"Mystery-horror spanning decades with interconnected stories revealed through mysterious drawings and paintings."},{"book_name":"Death Among the Undead","genre":"Mystery / Horror","author":"Masahiro Imamura","about":"Japanese mystery blending zombie horror with fair-play whodunnit logic, featuring locked-room murder amid a supernatural siege."},{"book_name":"The Killer's Shopping List","genre":"Thriller / Mystery","author":"Kang Ji-young","about":"Korean thriller following the investigation of a murder connected to a shopping list, adapted into a popular TV series."},{"book_name":"Time to Tell the Truth","genre":"Mystery","author":"Yuki Shinichiro","about":"Collection of mystery short stories featuring elaborate plot twists centered on secrets and deception."},{"book_name":"Mad","genre":"Thriller","author":"Chloe Esposito","about":"A woman impersonates her twin sister after she dies, uncovering mafia connections and deadly secrets during a chaotic week in Sicily."},{"book_name":"The Housemaid","genre":"Thriller","author":"Freida McFadden","about":"A young woman takes a job as a live-in housekeeper for a wealthy family but discovers disturbing secrets within the household."},{"book_name":"The Housemaid's Secret","genre":"Thriller","author":"Freida McFadden","about":"Sequel following the housemaid into a new job where she uncovers even more dangerous secrets and a hidden past."},{"book_name":"Never Lie","genre":"Thriller","author":"Freida McFadden","about":"A newlywed couple gets trapped in a remote house during a snowstorm, discovering disturbing recordings from a missing psychiatrist."},{"book_name":"We Used to Live Here","genre":"Horror / Thriller","author":"Marcus Kliewer","about":"A couple's house-flipping project is disrupted when strangers arrive claiming to have grown up there, leading to supernatural horror."},{"book_name":"Crime Orient","genre":"Detective Fiction","author":"Kittisak Kongka","about":"Thai detective fiction exploring crime investigations, part of the Twin Detective series."},{"book_name":"Radioactive Code","genre":"Detective Fiction","author":"Kittisak Kongka","about":"Thai detective novel involving criminal investigations with high-stakes scientific danger."},{"book_name":"The Suicide Shop","genre":"Dark Comedy / Literary Fiction","author":"Jean Teulé","about":"Dark comedy about a family-run shop specializing in suicide products, disrupted when their youngest child is born irrepressibly happy."},{"book_name":"The Gambler","genre":"Literary Fiction","author":"Fyodor Dostoevsky","about":"Semi-autobiographical novella following a man caught in obsessive gambling addiction and its destructive consequences."},{"book_name":"The Inconvenient Convenience Store","genre":"Literary Fiction","author":"Kim Ho-yeon (김호연)","about":"A homeless man finds redemption working at a convenience store, impacting the lives of regular customers in heartwarming ways."},{"book_name":"The Ark","genre":"Mystery / Thriller","author":"Haruo Yuki","about":"Trapped in a flooding underground building after an earthquake, a group must identify a murderer among them to escape."},{"book_name":"The Fortune-Telling Cat of Café Marnel","genre":"Fiction / Light Novel","author":"Hatsuki Hoto","about":"Japanese light fiction featuring a cat with fortune-telling abilities at a charming café, blending mystery and whimsy."},{"book_name":"How to Solve Your Own Murder","genre":"Mystery","author":"Kristen Perrin","about":"A darkly comedic mystery where a woman who spent decades preparing for her predicted murder is finally found dead."},{"book_name":"The Cherry Robbers","genre":"Gothic Fiction","author":"Sarai Walker","about":"Gothic tale exploring a cursed family of sisters in 1950s Connecticut where each bride meets a tragic fate."},{"book_name":"The Virgin Suicides","genre":"Literary Fiction","author":"Jeffrey Eugenides","about":"Neighborhood boys obsessively piece together the mystery of five sisters' suicides in 1970s suburban Michigan."},{"book_name":"The Theory of Everything Else","genre":"Non-Fiction / Humor","author":"Dan Schreiber","about":"Humorous exploration of obscure scientific theories, eccentric inventors, and cultural phenomena outside mainstream knowledge."},{"book_name":"The Art of Reading Minds","genre":"Self-Help / Psychology","author":"Henrik Fexeus","about":"Guide to understanding human behavior and body language to better interpret what others are thinking and feeling."},{"book_name":"Attention Span","genre":"Self-Help / Psychology","author":"Gloria Mark","about":"Explores how digital technology affects human concentration and offers science-backed strategies to manage attention."},{"book_name":"Hyperfocus","genre":"Self-Help / Productivity","author":"Chris Bailey","about":"Practical guide to managing attention and achieving deep focus for greater productivity and creativity."},{"book_name":"Make Time","genre":"Self-Help / Productivity","author":"Jake Knapp","about":"Productivity guide offering daily strategies and experiments to reclaim time and focus on what truly matters."},{"book_name":"The Courage to Be Disliked","genre":"Self-Help / Philosophy","author":"Ichiro Kishimi","about":"Dialogue-based book applying Adlerian psychology to overcome self-doubt, free yourself from others' expectations, and live authentically."},{"book_name":"Is Math Real?","genre":"Non-Fiction / Mathematics","author":"Eugenia Cheng","about":"Explores the philosophical nature of mathematics and whether it exists independently or is a human invention."},{"book_name":"100 Thinking Habits of Smart People","genre":"Self-Help / Personal Development","author":"Takashi Saito (齋藤孝)","about":"Japanese self-help guide presenting mental habits and thinking patterns practiced by highly effective individuals."},{"book_name":"Finish a Day's Work in 3 Hours","genre":"Self-Help / Productivity","author":"Yamamoto Nobuaki (山本憲明)","about":"Japanese productivity guide offering time-management techniques to eliminate waste and maximize work efficiency."},{"book_name":"How to Argue with a Cat","genre":"Self-Help / Communication","author":"Jay Heinrichs","about":"Humorous guide to persuasion and logical reasoning using cats as examples to teach rhetoric and argumentation."},{"book_name":"How to Give Zero F*cks","genre":"Self-Help / Humor","author":"Stephen Wildish","about":"Illustrated guide to mental freedom through letting go of unhelpful concerns and expectations."},{"book_name":"Feel-Good Productivity","genre":"Self-Help / Productivity","author":"Ali Abdaal","about":"Explores how productivity comes from positive emotions rather than discipline, featuring energizers, blockers, and sustainers."},{"book_name":"The Get Things Done Book","genre":"Self-Help / Productivity","author":"Mikael Krogerus","about":"Compiles 41 practical productivity tools including Pomodoro and Kanban, distilled to essential techniques for managing tasks."},{"book_name":"The Visual MBA","genre":"Business / Education","author":"Jason Barron","about":"Presents two years of business school concepts through sketch notes covering marketing, finance, operations, and strategy."},{"book_name":"The Psychology of Money","genre":"Personal Finance / Non-Fiction","author":"Morgan Housel","about":"Explores how psychology and emotions shape financial decision-making and the relationship between money and behavior."},{"book_name":"Longtunman 3.0","genre":"Investment / Finance","author":"Longtunman","about":"Thai investment guide from popular financial media brand covering investment strategies, business analysis, and financial literacy."},{"book_name":"What Money Can't Buy","genre":"Philosophy / Ethics","author":"Michael J. Sandel","about":"Examines the moral boundaries of markets, exploring what should and shouldn't be for sale in a just society."},{"book_name":"Money 101","genre":"Personal Finance","author":"Jakkapong Mesaphan","about":"Thai personal finance guide teaching money management, building reserves, managing risks, and achieving financial well-being."},{"book_name":"Money","genre":"Non-Fiction / History","author":"Yuval Noah Harari","about":"Illustrated extract from Sapiens tracing the history of money from the first coins to modern economics."},{"book_name":"The Maid","genre":"Mystery / Fiction","author":"Nita Prose","about":"A socially awkward hotel maid becomes the prime suspect when she discovers a wealthy guest dead in his room."},{"book_name":"Good-Bye","genre":"Literary Fiction","author":"Osamu Dazai","about":"Unfinished tragicomedy novella about a man trying to end his multiple romantic affairs in post-war Japan."},{"book_name":"Stop Procrastinating and Just Do It","genre":"Self-Help","author":"Hotta Shugo (堀田秀吾)","about":"Japanese self-help book on overcoming procrastination using science-backed methods to take immediate action."},{"book_name":"The Kamogawa Food Detectives","genre":"Fiction / Mystery","author":"Hisashi Kashiwai","about":"A father-daughter duo in Kyoto solve emotional mysteries by recreating meaningful dishes from their clients' memories."},{"book_name":"Arsène Lupin vs Herlock Sholmes","genre":"Mystery / Adventure","author":"Maurice Leblanc","about":"French master thief Arsène Lupin faces off against the brilliant detective Herlock Sholmes in a battle of wits."},{"book_name":"Arsène Lupin, Gentleman Burglar","genre":"Mystery / Adventure","author":"Maurice Leblanc","about":"Collection of stories featuring the charming and sophisticated gentleman thief pulling off elaborate heists across France."},{"book_name":"A Short History of Nearly Everything","genre":"Non-Fiction / Science","author":"Bill Bryson","about":"Accessible and witty exploration of science covering everything from the Big Bang to modern discoveries."},{"book_name":"Murdle","genre":"Puzzle / Mystery","author":"G.T. Karber","about":"Collection of murder mystery logic puzzles combining deductive reasoning with grid-based problem-solving."},{"book_name":"The Return of Sherlock Holmes","genre":"Mystery / Detective Fiction","author":"Arthur Conan Doyle","about":"Collection of thirteen stories featuring Holmes' dramatic return from apparent death and subsequent investigations."},{"book_name":"His Last Bow","genre":"Mystery / Detective Fiction","author":"Arthur Conan Doyle","about":"Collection of stories featuring Holmes' later cases, including his final adventure during World War I."},{"book_name":"The Casebook of Sherlock Holmes","genre":"Mystery / Detective Fiction","author":"Arthur Conan Doyle","about":"The final collection of Sherlock Holmes short stories showcasing the detective's later investigations."},{"book_name":"The Hound of the Baskervilles","genre":"Mystery / Detective Fiction","author":"Arthur Conan Doyle","about":"Holmes investigates a supernatural curse and mysterious hound plaguing the Baskerville family on the Devon moors."},{"book_name":"The Valley of Fear","genre":"Mystery / Detective Fiction","author":"Arthur Conan Doyle","about":"A locked-room murder mystery intertwined with an American mining town conspiracy uncovered by Holmes and Watson."},{"book_name":"The Adventures of Sherlock Holmes","genre":"Mystery / Detective Fiction","author":"Arthur Conan Doyle","about":"The first collection of twelve short stories establishing Holmes' legendary deductive methods and iconic cases."},{"book_name":"The Memoirs of Sherlock Holmes","genre":"Mystery / Detective Fiction","author":"Arthur Conan Doyle","about":"Collection of eleven stories concluding with Holmes' apparent death at Reichenbach Falls battling Professor Moriarty."},{"book_name":"The Sign of the Four","genre":"Mystery / Detective Fiction","author":"Arthur Conan Doyle","about":"Holmes and Watson unravel a murder mystery connected to stolen treasure from the Indian Rebellion."},{"book_name":"A Study in Scarlet","genre":"Mystery / Detective Fiction","author":"Arthur Conan Doyle","about":"The first Sherlock Holmes novel, introducing the detective and Watson as they solve a puzzling murder with American connections."},{"book_name":"Think and Grow Rich","genre":"Self-Help / Personal Finance","author":"Napoleon Hill","about":"Classic self-help book outlining a philosophy of success through desire, faith, visualization, and persistent effort."},{"book_name":"Selling with Heart: Osaka Merchant Style","genre":"Business","author":"Kenji Nakamura","about":"Japanese business book exploring Osaka merchant philosophy and principles of ethical, people-centered sales and commerce."}];
+
+    /* ── Genre color palette ── */
+    const GENRE_COLORS = {
+      'Mystery':     '#C4A24E',
+      'Thriller':    '#C06868',
+      'Fiction':     '#8B7EC8',
+      'Self-Help':   '#5FAD82',
+      'Finance':     '#4EA0A0',
+      'Non-Fiction': '#6890C8',
+      'Business':    '#C89660',
+      'Horror':      '#9060A8',
+      'Philosophy':  '#A08860',
+    };
+    function genreColor(g) { return GENRE_COLORS[g] || null; }
+
+    function normalizeGenre(raw) {
+      const g = raw.trim();
+      if (/^(personal finance|investment)/i.test(g))         return 'Finance';
+      if (/^puzzle/i.test(g))                                 return 'Mystery';
+      if (/^dark comedy/i.test(g))                            return 'Fiction';
+      if (/^psychological thriller/i.test(g))                 return 'Thriller';
+      if (/^detective fiction/i.test(g))                      return 'Mystery';
+      if (/^(historical|literary|gothic) fiction/i.test(g))  return 'Fiction';
+      if (/^fiction/i.test(g))                                return 'Fiction';
+      return g.split('/')[0].trim();
+    }
+
+    function mapBooks(arr) {
+      return arr.map(b => ({
+        title:  b.book_name,
+        author: b.author,
+        genre:  normalizeGenre(b.genre),
+        about:  b.about || '',
+      }));
+    }
+
+    /* Inline fallback — shown immediately and replaced by server data
+       when running via localhost (npm start). */
+    const BOOKS_FALLBACK = mapBooks(RAW);
+
+    /* ─────────────────────────────────────────────────────────────
+       GENRE PARTICLES
+    ───────────────────────────────────────────────────────────── */
+    const GENRE_PARTICLES = {
+      'Fiction':   { chars: ['✦','·','✧','⋆','·','✦','⋆'], color: 'rgba(139,126,200,0.5)', dir: 'up' },
+      'Self-Help': { chars: ['+','✦','+','◆','+','✦','+'], color: 'rgba(95,173,130,0.55)',  dir: 'up' },
+    };
+
+    function Particles({ genre }) {
+      const cfg = GENRE_PARTICLES[genre];
+      if (!cfg) return null;
+      return (
+        <div className="atm-particles" aria-hidden="true">
+          {Array.from({ length: 13 }, (_, i) => (
+            <span
+              key={i}
+              className={`atm-particle atm-particle--${cfg.dir}`}
+              style={{
+                left:              `${((i * 7.7) + 3) % 94}%`,
+                [cfg.dir === 'up' ? 'bottom' : 'top']: '-5px',
+                color:             cfg.color,
+                fontSize:          `${10 + (i % 4) * 3}px`,
+                animationDelay:    `${((i * 0.43) % 4.2).toFixed(2)}s`,
+                animationDuration: `${(3.8 + (i % 5) * 0.45).toFixed(1)}s`,
+              }}
+            >
+              {cfg.chars[i % cfg.chars.length]}
+            </span>
+          ))}
+        </div>
+      );
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+       APP
+    ───────────────────────────────────────────────────────────── */
+    function Bookshelf() {
+      useStyles();
+
+      const [books, setBooks]              = useState(BOOKS_FALLBACK);
+      const [activeGenre, setActiveGenre]  = useState(null);
+      const [searchQuery, setSearchQuery]  = useState('');
+      const [sortAZ, setSortAZ]            = useState(false);
+      const searchRef = useRef(null);
+
+      /* When served via localhost, fetch live data from server */
+      useEffect(() => {
+        if (window.location.protocol === 'file:') return;
+        fetch('/api/books')
+          .then(r => r.json())
+          .then(data => setBooks(mapBooks(data)))
+          .catch(() => {});
+      }, []);
+
+      /* Sync genre atmosphere to body for CSS theming */
+      useEffect(() => {
+        if (activeGenre) {
+          document.body.dataset.genre = activeGenre;
+        } else {
+          delete document.body.dataset.genre;
+        }
+        return () => { delete document.body.dataset.genre; };
+      }, [activeGenre]);
+
+      const genres = useMemo(() => {
+        const seen = new Set();
+        const order = [];
+        books.forEach(b => { if (!seen.has(b.genre)) { seen.add(b.genre); order.push(b.genre); } });
+        return order;
+      }, [books]);
+
+      const genreCounts = useMemo(() => {
+        const counts = {};
+        books.forEach(b => { counts[b.genre] = (counts[b.genre] || 0) + 1; });
+        return counts;
+      }, [books]);
+
+      const visibleBooks = useMemo(() => {
+        let list = books;
+        if (activeGenre) list = list.filter(b => b.genre === activeGenre);
+        if (searchQuery.trim()) {
+          const q = searchQuery.trim().toLowerCase();
+          list = list.filter(b =>
+            b.title.toLowerCase().includes(q) ||
+            b.author.toLowerCase().includes(q)
+          );
+        }
+        if (sortAZ) list = [...list].sort((a, b) => a.title.localeCompare(b.title));
+        return list;
+      }, [books, activeGenre, searchQuery, sortAZ]);
+
+      const total = String(books.length).padStart(3, '0');
+      const shown = visibleBooks.length;
+      const isFiltered = activeGenre !== null || searchQuery.trim() !== '';
+
+      function handleGenreSelect(g) {
+        setActiveGenre(g);
+        setSearchQuery('');
+      }
+
+      return (
+        <React.Fragment>
+        <div className="atm-glow"     aria-hidden="true" />
+        <div className="atm-fx"       aria-hidden="true" />
+        <div className="atm-vignette" aria-hidden="true" />
+        <div className="atm-drip"     aria-hidden="true" />
+        <Particles genre={activeGenre} />
+        <div className="shelf-page">
+          <header className="shelf-header">
+            <div className="shelf-header-top">
+              <span className="shelf-label">Reading List</span>
+              <Clock />
+            </div>
+            <div className="shelf-header-bottom">
+              <span className="shelf-name">Dan</span>
+              <Status />
+            </div>
+          </header>
+
+          <div className="sticky-controls">
+            {/* Genre filter — horizontal scroll, no wrap */}
+            <nav className="genre-filter" role="navigation" aria-label="Filter by genre">
+              <button
+                className={`genre-btn ${activeGenre === null && !searchQuery ? 'is-active' : ''}`}
+                style={activeGenre === null && !searchQuery ? { color: '#DDDBD5' } : undefined}
+                onClick={() => handleGenreSelect(null)}
+              >
+                All <span className="genre-count">{books.length}</span>
+              </button>
+              {genres.map(g => {
+                const isActive = activeGenre === g;
+                const gc = genreColor(g);
+                return (
+                  <button
+                    key={g}
+                    className={`genre-btn ${isActive ? 'is-active' : ''}`}
+                    style={isActive && gc ? { color: gc } : undefined}
+                    onClick={() => handleGenreSelect(g)}
+                  >
+                    {g} <span className="genre-count">{genreCounts[g]}</span>
+                  </button>
+                );
+              })}
+            </nav>
+
+            {/* Search + sort */}
+            <div className="search-row">
+              <input
+                ref={searchRef}
+                className="search-input"
+                type="search"
+                inputMode="search"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
+                placeholder="Search titles, authors…"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                aria-label="Search books"
+              />
+              {searchQuery && (
+                <button
+                  className="search-clear"
+                  onClick={() => { setSearchQuery(''); searchRef.current?.focus(); }}
+                  aria-label="Clear search"
+                >
+                  ×
+                </button>
+              )}
+              <button
+                className={`sort-btn ${sortAZ ? 'is-active' : ''}`}
+                onClick={() => setSortAZ(v => !v)}
+                aria-label="Sort A to Z"
+              >
+                A→Z
+              </button>
+            </div>
+          </div>
+
+          <main className="shelf-books">
+            {visibleBooks.length > 0
+              ? visibleBooks.map(book => <BookEntry key={book.title} book={book} />)
+              : <p className="no-results">No books found.</p>
+            }
+          </main>
+
+          <footer className="shelf-footer">
+            <span className="footer-lib">Dan's Library</span>
+            <span className="footer-count">
+              {isFiltered
+                ? `${shown} of ${total}`
+                : `${total} volumes`}
+            </span>
+          </footer>
+        </div>
+        </React.Fragment>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<Bookshelf />);
+  </script>
+</body>
+</html>
