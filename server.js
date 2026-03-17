@@ -12,6 +12,9 @@ const REPO_URL  = 'https://github.com/craftbydan/Bookshelf.git';
 app.use(express.json({ limit: '2mb' }));
 app.use(express.static(DIR));
 
+/* ── Root ───────────────────────────────────────────────── */
+app.get('/', (_req, res) => res.sendFile(path.join(DIR, 'index.html')));
+
 /* ── Admin page ─────────────────────────────────────────── */
 app.get('/admin', (_req, res) => res.sendFile(path.join(DIR, 'admin.html')));
 
